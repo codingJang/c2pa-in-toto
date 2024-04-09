@@ -1,5 +1,18 @@
 # Changelog
 
+## v2.3.0
+
+### Added
+* in-toto-verify CLI: `--inspection-timeout` arg (#695)
+
+### Changed
+* Improve Dependabot config (#701)
+* Constrain securesystemslib dependency to <0.32.0 in preparation for future
+  securesystemslib API changes (#726)
+
+### Removed
+* Obsolete six dependency in debian/control (#687)
+
 ## v2.2.0
 __NOTE:__  This release, fully integrates the new [securesystemslib Signer API
 ](https://python-securesystemslib.readthedocs.io/en/latest/signer.html).
