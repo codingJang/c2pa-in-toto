@@ -6,6 +6,7 @@ permissions: {}
 
 jobs:
   test:
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       # Run regular in-toto tests on each OS/Python combination, plus linters
@@ -14,13 +15,16 @@ jobs:
         python-version: ['3.8', '3.9', '3.10', '3.11']
         os: [ubuntu-latest, macos-latest, windows-latest]
         toxenv: [py]
+        experimental: [false]
         include:
           - python-version: '3.8'
             os: ubuntu-latest
             toxenv: lint
+            experimental: false
           - python-version: 3.x
             os: ubuntu-latest
             toxenv: with-sslib-main
+            experimental: true
 
     runs-on: ${{ matrix.os }}
 
