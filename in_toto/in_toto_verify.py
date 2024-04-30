@@ -29,17 +29,9 @@ import argparse
 import logging
 import sys
 
-from securesystemslib import interface
 from securesystemslib.gpg import functions as gpg_interface
 
-from in_toto import (
-    KEY_TYPE_ECDSA,
-    KEY_TYPE_ED25519,
-    KEY_TYPE_RSA,
-    SUPPORTED_KEY_TYPES,
-    __version__,
-    verifylib,
-)
+from in_toto import __version__, verifylib
 from in_toto.common_args import (
     GPG_HOME_ARGS,
     GPG_HOME_KWARGS,
@@ -142,41 +134,6 @@ for which the public part can be found in the GPG keyring at '~/.gnupg'.
             " verified."
         ),
     )
-
-    named_args.add_argument(
-        "-k",
-        "--layout-keys",
-        type=str,
-        metavar="<path>",
-        nargs="+",
-        help=(
-            "paths to public key files used to verify the passed root layout's"
-            " signatures. See '--key-types' for available formats. Passing at least"
-            " one key using '--layout-keys' and/or '--gpg' is required. For each"
-            " passed key the layout must carry a valid signature."
-        ),
-    )
-
-    parser.add_argument(
-        "-t",
-        "--key-types",
-        dest="key_types",
-        type=str,
-        choices=SUPPORTED_KEY_TYPES,
-        nargs="+",
-        help=(
-            "types of keys specified by the '--layout-keys' option. '{rsa}' keys are"
-            " expected in a 'PEM' format. '{ed25519}' and '{ecdsa}' are expected"
-            " in a custom 'securesystemslib/json' format. If multiple keys are"
-            " passed via '--layout-keys' the same amount of key types must be"
-            " passed. Key types are then associated with keys by index. If"
-            " '--key-types' is omitted, the default of '{rsa}' is used for all"
-            " keys.".format(
-                rsa=KEY_TYPE_RSA, ed25519=KEY_TYPE_ED25519, ecdsa=KEY_TYPE_ECDSA
-            )
-        ),
-    )
-
     named_args.add_argument(
         "--verification-keys",
         type=str,
@@ -258,12 +215,11 @@ def main():
     LOG.setLevelVerboseOrQuiet(args.verbose, args.quiet)
 
     # For verifying at least one public key must be specified
-    if not (args.layout_keys or args.gpg or args.verification_keys):
+    if not (args.gpg or args.verification_keys):
         parser.print_help()
         parser.error(
             "wrong arguments: specify at least one layout verification key:"
-            " '--layout-keys path [path ...]' or  '--gpg id [id ...]' or "
-            " '--verification-keys path [path ...]'."
+            " '--verification-keys path [path ...]' and/or '--gpg id [id ...]'."
         )
 
     try:
@@ -271,19 +227,6 @@ def main():
         layout = Metadata.load(args.layout)
 
         layout_key_dict = {}
-        if args.layout_keys is not None:
-            LOG.info("Loading layout key(s)...")
-            LOG.warning(
-                "'-k', '--layout-keys' is deprecated, use "
-                "'--verification-keys' instead."
-            )
-
-            layout_key_dict.update(
-                interface.import_publickeys_from_file(
-                    args.layout_keys, args.key_types
-                )
-            )
-
         if args.gpg is not None:
             LOG.info("Loading layout gpg key(s)...")
             layout_key_dict.update(
