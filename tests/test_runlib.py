@@ -36,12 +36,10 @@ import securesystemslib.exceptions
 import securesystemslib.formats
 from securesystemslib.interface import (
     generate_and_write_unencrypted_rsa_keypair,
-    import_ed25519_privatekey_from_file,
-    import_ed25519_publickey_from_file,
     import_rsa_privatekey_from_file,
     import_rsa_publickey_from_file,
 )
-from securesystemslib.signer import CryptoSigner, Signer
+from securesystemslib.signer import Signer
 
 import in_toto.exceptions
 import in_toto.settings
@@ -62,7 +60,7 @@ from in_toto.runlib import (
     in_toto_run,
     record_artifacts_as_dict,
 )
-from tests.common import TmpDirMixin
+from tests.common import SignerStore, TmpDirMixin
 
 
 def _apply_exclude_patterns(names, patterns):
@@ -1408,17 +1406,12 @@ class TestSigner(unittest.TestCase, TmpDirMixin):
     @classmethod
     def setUpClass(cls):
         cls.set_up_test_dir()  # teardown is called implicitly
-        keys = Path(__file__).parent / "demo_files"
 
-        rsa = "alice"
-        rsa_priv = import_rsa_privatekey_from_file(str(keys / rsa))
-        cls.rsa_pub = import_rsa_publickey_from_file(str(keys / f"{rsa}.pub"))
-        cls.rsa_signer = CryptoSigner.from_securesystemslib_key(rsa_priv)
+        cls.rsa_pub = SignerStore.rsa_pub
+        cls.rsa_signer = SignerStore.rsa
 
-        ed = "danny"
-        ed_priv = import_ed25519_privatekey_from_file(str(keys / ed))
-        cls.ed_pub = import_ed25519_publickey_from_file(str(keys / f"{ed}.pub"))
-        cls.ed_signer = CryptoSigner.from_securesystemslib_key(ed_priv)
+        cls.ed_pub = SignerStore.ed25519_pub
+        cls.ed_signer = SignerStore.ed25519
 
     def test_run(self):
         # Successfully create, sign and verify link
