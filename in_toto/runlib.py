@@ -41,16 +41,11 @@ import securesystemslib.exceptions
 import securesystemslib.formats
 import securesystemslib.gpg
 import securesystemslib.hash
-from securesystemslib.signer import Key, Signature, Signer, SSlibSigner
+from securesystemslib.signer import Key, Signature, Signer
 
 import in_toto.exceptions
 import in_toto.settings
-from in_toto.formats import (
-    _check_hex,
-    _check_signing_key,
-    _check_str,
-    _check_str_list,
-)
+from in_toto.formats import _check_hex, _check_str, _check_str_list
 from in_toto.models._signer import GPGSigner
 from in_toto.models.link import (
     FILENAME_FORMAT,
@@ -407,11 +402,10 @@ def _check_signer(signer):
         raise ValueError("only Signer instances with public key supported")
 
 
-def _require_signing_arg(signer, signing_key, gpg_keyid, gpg_use_default):
-    if not any([signer, signing_key, gpg_keyid, gpg_use_default]):
+def _require_signing_arg(signer, gpg_keyid, gpg_use_default):
+    if not any([signer, gpg_keyid, gpg_use_default]):
         raise ValueError(
-            "Pass either a signer, a signing key, a gpg keyid or set"
-            " gpg_use_default to True!"
+            "Pass either a signer, a gpg keyid or set gpg_use_default to True!"
         )
 
 
@@ -421,7 +415,6 @@ def in_toto_run(
     product_list,
     link_cmd_args,
     record_streams=False,
-    signing_key=None,
     gpg_keyid=None,
     gpg_use_default=False,
     gpg_home=None,
@@ -440,7 +433,7 @@ def in_toto_run(
 
   Executes link_cmd_args, recording paths and hashes of files before and after
   command execution (aka. artifacts) in a link metadata file. The metadata is
-  signed with the passed signer, signing_key, a gpg key identified by its ID, or
+  signed with the passed signer, a gpg key identified by its ID, or
   the default gpg key. If multiple key arguments are passed, only one key is
   used in above order of precedence. The resulting link file is written to
   ``STEP-NAME.KEYID-PREFIX.link``. If no key argument is passed the link
@@ -461,11 +454,6 @@ def in_toto_run(
     record_streams (optional): A boolean indicating if standard output and
         standard error of the link command should be recorded in the link
         metadata in addition to being displayed while the command is executed.
-
-    signing_key (optional): A key used to sign the resulting link metadata.
-
-        .. deprecated:: 2.2.0
-           Please pass a ``signer`` instead.
 
     gpg_keyid (optional): A keyid used to identify a local gpg key used to sign
         the resulting link metadata.
@@ -547,9 +535,6 @@ def in_toto_run(
     if signer:
         _check_signer(signer)
 
-    if signing_key:
-        _check_signing_key(signing_key)
-
     if gpg_keyid:
         _check_hex(gpg_keyid)
 
@@ -618,10 +603,6 @@ def in_toto_run(
     if signer:
         LOG.info("Signing link metadata using passed signer...")
 
-    elif signing_key:
-        LOG.info("Signing link metadata using passed key...")
-        signer = SSlibSigner(signing_key)
-
     elif gpg_keyid:
         LOG.info("Signing link metadata using passed GPG keyid...")
         signer = GPGSigner(keyid=gpg_keyid, homedir=gpg_home)
@@ -649,7 +630,6 @@ def in_toto_run(
 def in_toto_record_start(
     step_name,
     material_list,
-    signing_key=None,
     gpg_keyid=None,
     gpg_use_default=False,
     gpg_home=None,
@@ -664,7 +644,7 @@ def in_toto_record_start(
     """Generates preliminary link metadata.
 
   Records paths and hashes of materials in a preliminary link metadata file. The
-  metadata is signed with the passed signer, signing_key, a gpg key identified
+  metadata is signed with the passed signer, a gpg key identified
   by its ID, or the default gpg key. If multiple key arguments are passed, only
   one key is used in above order of precedence. At least one key argument must
   be passed. The resulting link file is written to
@@ -679,11 +659,6 @@ def in_toto_record_start(
 
     material_list: A list of artifact paths to be recorded as materials.
         Directories are traversed recursively.
-
-    signing_key (optional): A key used to sign the resulting link metadata.
-
-        .. deprecated:: 2.2.0
-           Please pass a ``signer`` instead.
 
     gpg_keyid (optional): A keyid used to identify a local gpg key used to sign
         the resulting link metadata.
@@ -719,7 +694,7 @@ def in_toto_record_start(
   Raises:
     securesystemslib.exceptions.FormatError: Passed arguments are malformed.
 
-    ValueError: None of signing_key, gpg_keyid or gpg_use_default=True is
+    ValueError: None of signer, gpg_keyid or gpg_use_default=True is
         passed.
 
     securesystemslib.exceptions.StorageError: Cannot hash artifacts.
@@ -750,14 +725,11 @@ def in_toto_record_start(
     LOG.info("Start recording '%s'...", step_name)
 
     # Fail if there is no signing key arg at all
-    _require_signing_arg(signer, signing_key, gpg_keyid, gpg_use_default)
+    _require_signing_arg(signer, gpg_keyid, gpg_use_default)
 
     # Check key formats to fail early
     if signer:
         _check_signer(signer)
-
-    if signing_key:
-        _check_signing_key(signing_key)
 
     if gpg_keyid:
         _check_str(gpg_keyid)
@@ -804,10 +776,6 @@ def in_toto_record_start(
     if signer:
         LOG.info("Signing link metadata using passed signer...")
 
-    elif signing_key:
-        LOG.info("Signing link metadata using passed key...")
-        signer = SSlibSigner(signing_key)
-
     elif gpg_keyid:
         LOG.info("Signing link metadata using passed GPG keyid...")
         signer = GPGSigner(keyid=gpg_keyid, homedir=gpg_home)
@@ -831,7 +799,6 @@ def in_toto_record_start(
 def in_toto_record_stop(
     step_name,
     product_list,
-    signing_key=None,
     gpg_keyid=None,
     gpg_use_default=False,
     gpg_home=None,
@@ -849,7 +816,7 @@ def in_toto_record_stop(
 
   Loads preliminary link metadata file, verifies its signature, and records
   paths and hashes as products, thus finalizing the link metadata. The metadata
-  is signed with the passed signer, signing_key, a gpg key identified by its ID,
+  is signed with the passed signer, a gpg key identified by its ID,
   or the default gpg key. If multiple key arguments are passed, only one key is
   used in above order of precedence. At least one key argument must be passed
   and it must be the same as the one used to sign the preliminary link metadata
@@ -864,11 +831,6 @@ def in_toto_record_stop(
 
     product_list: A list of artifact paths to be recorded as products.
         Directories are traversed recursively.
-
-    signing_key (optional): A key used to sign the resulting link metadata.
-
-        .. deprecated:: 2.2.0
-           Please pass a ``signer`` instead.
 
     gpg_keyid (optional): A keyid used to identify a local gpg key used to sign
         the resulting link metadata.
@@ -918,7 +880,7 @@ def in_toto_record_stop(
   Raises:
     securesystemslib.exceptions.FormatError: Passed arguments are malformed.
 
-    ValueError: None of signing_key, gpg_keyid or gpg_use_default=True is
+    ValueError: None of gpg_keyid or gpg_use_default=True is
         passed.
 
     LinkNotFoundError: No preliminary link metadata file found.
@@ -952,13 +914,10 @@ def in_toto_record_stop(
     LOG.info("Stop recording '%s'...", step_name)
 
     # Check that we have something to sign and if the formats are right
-    _require_signing_arg(signer, signing_key, gpg_keyid, gpg_use_default)
+    _require_signing_arg(signer, gpg_keyid, gpg_use_default)
 
     if signer:
         _check_signer(signer)
-
-    if signing_key:
-        _check_signing_key(signing_key)
 
     if gpg_keyid:
         _check_hex(gpg_keyid)
@@ -977,11 +936,6 @@ def in_toto_record_stop(
     if signer:
         unfinished_fn = UNFINISHED_FILENAME_FORMAT.format(
             step_name=step_name, keyid=signer.public_key.keyid
-        )
-
-    elif signing_key:
-        unfinished_fn = UNFINISHED_FILENAME_FORMAT.format(
-            step_name=step_name, keyid=signing_key["keyid"]
         )
 
     # FIXME: Currently there is no way to know the default GPG key's keyid and
@@ -1015,19 +969,12 @@ def in_toto_record_stop(
     link_metadata = Metadata.load(unfinished_fn)
 
     # The file must have been signed by the same key
-    # If we have a signing_key we use it for verification as well
+    # If we have a signer we use it for verification as well
     if signer:
         LOG.info("Verifying preliminary link signature using passed signer...")
         keyid = signer.public_key.keyid
         verification_key = signer.public_key.to_dict()
         verification_key["keyid"] = keyid
-
-    elif signing_key:
-        LOG.info(
-            "Verifying preliminary link signature using passed signing key..."
-        )
-        keyid = signing_key["keyid"]
-        verification_key = signing_key
 
     elif gpg_keyid:
         LOG.info("Verifying preliminary link signature using passed gpg key...")
@@ -1098,10 +1045,6 @@ def in_toto_record_stop(
                 signer.public_key.keyid
             )
         )
-
-    elif signing_key:
-        LOG.info("Updating signature with key '{:.8}...'...".format(keyid))
-        signer = SSlibSigner(signing_key)
 
     else:  # gpg_keyid or gpg_use_default
         # In both cases we use the keyid we got from verifying the preliminary

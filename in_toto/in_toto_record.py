@@ -31,8 +31,6 @@ import logging
 import sys
 from getpass import getpass
 
-from securesystemslib import interface
-
 import in_toto.runlib
 from in_toto import __version__
 from in_toto.common_args import (
@@ -46,12 +44,8 @@ from in_toto.common_args import (
     GPG_HOME_ARGS,
     GPG_HOME_KWARGS,
     GPG_KWARGS,
-    KEY_ARGS,
-    KEY_KWARGS,
     KEY_PASSWORD_ARGS,
     KEY_PASSWORD_KWARGS,
-    KEY_TYPE_ARGS,
-    KEY_TYPE_KWARGS,
     LSTRIP_PATHS_ARGS,
     LSTRIP_PATHS_KWARGS,
     METADATA_DIRECTORY_ARGS,
@@ -138,8 +132,6 @@ file to the target directory (on stop).
         ),
     )
 
-    parent_named_args.add_argument(*KEY_ARGS, **KEY_KWARGS)
-    parent_parser.add_argument(*KEY_TYPE_ARGS, **KEY_TYPE_KWARGS)
     parent_parser.add_argument(*KEY_PASSWORD_ARGS, **KEY_PASSWORD_KWARGS)
 
     parent_named_args.add_argument(*GPG_ARGS, **GPG_KWARGS)
@@ -238,12 +230,11 @@ def main():
 
     LOG.setLevelVerboseOrQuiet(args.verbose, args.quiet)
 
-    # Use exactly one of legacy key, gpg or pkcs8 signing key
-    if sum([bool(args.key), bool(args.gpg), bool(args.signing_key)]) != 1:
+    # Use exactly one of gpg or pkcs8 signing key
+    if sum([bool(args.gpg), bool(args.signing_key)]) != 1:
         parser.print_usage()
         parser.error(
-            "Specify exactly one of '--key <key path>', "
-            "--gpg [<keyid>]' or --signing-key <key path>"
+            "Specify either '--signing-key <path>' or '--gpg [<keyid>]'"
         )
 
     password, prompt = parse_password_and_prompt_args(args)
@@ -258,20 +249,6 @@ def main():
         gpg_keyid = args.gpg
 
     try:
-        # We load the key here because it might prompt the user for a password in
-        # case the key is encrypted. Something that should not happen in the lib.
-        key = None
-        if args.key:
-            LOG.warning(
-                "'-k', '--key' is deprecated, use '--signing-key' instead."
-            )
-            key = interface.import_privatekey_from_file(
-                args.key,
-                key_type=args.key_type,
-                password=password,
-                prompt=prompt,
-            )
-
         signer = None
         if args.signing_key:
             if prompt:
@@ -288,7 +265,6 @@ def main():
             in_toto.runlib.in_toto_record_start(
                 args.step_name,
                 args.materials,
-                signing_key=key,
                 gpg_keyid=gpg_keyid,
                 gpg_use_default=gpg_use_default,
                 gpg_home=args.gpg_home,
@@ -304,7 +280,6 @@ def main():
             in_toto.runlib.in_toto_record_stop(
                 args.step_name,
                 args.products,
-                signing_key=key,
                 gpg_keyid=gpg_keyid,
                 gpg_use_default=gpg_use_default,
                 gpg_home=args.gpg_home,

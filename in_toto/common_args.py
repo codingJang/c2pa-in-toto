@@ -30,12 +30,6 @@
 """
 import sys
 
-from in_toto import (
-    KEY_TYPE_ECDSA,
-    KEY_TYPE_ED25519,
-    KEY_TYPE_RSA,
-    SUPPORTED_KEY_TYPES,
-)
 from in_toto.settings import LINK_CMD_EXEC_TIMEOUT
 
 EXCLUDE_ARGS = ["--exclude"]
@@ -77,34 +71,6 @@ LSTRIP_PATHS_KWARGS = {
         " specified, only a single prefix can match the path of any"
         " artifact and that is then left-stripped. All prefixes are checked"
         " to ensure none of them are a left substring of another."
-    ),
-}
-
-KEY_ARGS = ["-k", "--key"]
-KEY_KWARGS = {
-    "type": str,
-    "metavar": "<path>",
-    "help": (
-        "path to a private key file to sign the resulting link metadata."
-        " The keyid prefix is used as an infix for the link metadata"
-        " filename, i.e. '<name>.<keyid prefix>.link'. See '--key-type' for"
-        " available formats. Passing one of '--key' or '--gpg' is required."
-    ),
-}
-
-KEY_TYPE_ARGS = ["-t", "--key-type"]
-KEY_TYPE_KWARGS = {
-    "dest": "key_type",
-    "type": str,
-    "choices": SUPPORTED_KEY_TYPES,
-    "default": KEY_TYPE_RSA,
-    "help": (
-        "type of key specified by the '--key' option. '{rsa}' keys are"
-        " expected in a 'PEM' format. '{ed25519}' and '{ecdsa}' are"
-        " expected to be in a custom 'securesystemslib/json' format."
-        " Default is '{rsa}'.".format(
-            rsa=KEY_TYPE_RSA, ed25519=KEY_TYPE_ED25519, ecdsa=KEY_TYPE_ECDSA
-        )
     ),
 }
 
