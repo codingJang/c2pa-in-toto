@@ -34,7 +34,7 @@ import iso8601
 import securesystemslib.exceptions
 import securesystemslib.formats
 from dateutil import tz
-from securesystemslib.gpg.exceptions import KeyExpirationError
+from securesystemslib._gpg.exceptions import KeyExpirationError
 
 import in_toto.formats
 import in_toto.models.layout
@@ -383,7 +383,7 @@ def verify_metadata_signatures(metadata, keys_dict):
         if an empty verification key dictionary was passed, or
         if any of the passed verification keys fails to verify a signature.
 
-      securesystemslib.gpg.exceptions.KeyExpirationError:
+      securesystemslib._gpg.exceptions.KeyExpirationError:
         if any of the passed verification keys is an expired gpg key
 
     """

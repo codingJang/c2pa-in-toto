@@ -37,9 +37,9 @@ import tempfile
 import time
 from collections import defaultdict
 
+import securesystemslib._gpg
 import securesystemslib.exceptions
 import securesystemslib.formats
-import securesystemslib.gpg
 import securesystemslib.hash
 from securesystemslib.signer import Signer
 
@@ -506,8 +506,8 @@ def in_toto_run(
             securesystemslib.exceptions.UnsupportedAlgorithmError:
         Signing errors.
 
-    ValueError, OSError, securesystemslib.gpg.exceptions.CommandError, \
-            securesystemslib.gpg.exceptions.KeyNotFoundError:
+    ValueError, OSError, securesystemslib._gpg.exceptions.CommandError, \
+            securesystemslib._gpg.exceptions.KeyNotFoundError:
         gpg signing errors.
 
   Side Effects:
@@ -703,8 +703,8 @@ def in_toto_record_start(
             securesystemslib.exceptions.UnsupportedAlgorithmError:
         Signing errors.
 
-    ValueError, OSError, securesystemslib.gpg.exceptions.CommandError, \
-            securesystemslib.gpg.exceptions.KeyNotFoundError:
+    ValueError, OSError, securesystemslib._gpg.exceptions.CommandError, \
+            securesystemslib._gpg.exceptions.KeyNotFoundError:
         gpg signing errors.
 
   Side Effects:
@@ -891,8 +891,8 @@ def in_toto_record_stop(
             securesystemslib.exceptions.UnsupportedAlgorithmError:
         Signing errors.
 
-    ValueError, OSError, securesystemslib.gpg.exceptions.CommandError, \
-            securesystemslib.gpg.exceptions.KeyNotFoundError:
+    ValueError, OSError, securesystemslib._gpg.exceptions.CommandError, \
+            securesystemslib._gpg.exceptions.KeyNotFoundError:
         gpg signing errors.
 
   Side Effects:
@@ -971,7 +971,7 @@ def in_toto_record_stop(
 
     elif gpg_keyid:
         LOG.info("Verifying preliminary link signature using passed gpg key...")
-        gpg_pubkey = securesystemslib.gpg.functions.export_pubkey(
+        gpg_pubkey = securesystemslib._gpg.functions.export_pubkey(  # pylint: disable=protected-access
             gpg_keyid, gpg_home
         )
         keyid = gpg_pubkey["keyid"]
@@ -997,7 +997,7 @@ def in_toto_record_stop(
         else:
             keyid = link_metadata.signatures[0]["keyid"]
 
-        gpg_pubkey = securesystemslib.gpg.functions.export_pubkey(
+        gpg_pubkey = securesystemslib._gpg.functions.export_pubkey(  # pylint: disable=protected-access
             keyid, gpg_home
         )
         verification_key = gpg_pubkey

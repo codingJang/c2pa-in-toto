@@ -23,12 +23,12 @@
 import unittest
 from pathlib import Path
 
+from securesystemslib._gpg.constants import have_gpg
+from securesystemslib._gpg.functions import export_pubkey
 from securesystemslib.exceptions import (
     UnverifiedSignatureError,
     VerificationError,
 )
-from securesystemslib.gpg.constants import have_gpg
-from securesystemslib.gpg.functions import export_pubkey
 
 from in_toto.models._signer import (
     GPGKey,

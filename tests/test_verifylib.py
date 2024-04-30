@@ -32,11 +32,11 @@ import unittest
 from datetime import datetime, timezone
 from unittest.mock import patch
 
+import securesystemslib._gpg.functions
 import securesystemslib.exceptions
-import securesystemslib.gpg.functions
 from dateutil.relativedelta import relativedelta
-from securesystemslib.gpg.constants import have_gpg
-from securesystemslib.gpg.exceptions import KeyExpirationError
+from securesystemslib._gpg.constants import have_gpg
+from securesystemslib._gpg.exceptions import KeyExpirationError
 
 import in_toto.exceptions
 import in_toto.settings
@@ -1348,14 +1348,14 @@ class TestInTotoVerifyThresholdsGpgSubkeys(
         cls.set_up_test_dir()
         cls.set_up_gpg_keys()
 
-        master_key = securesystemslib.gpg.functions.export_pubkey(
+        master_key = securesystemslib._gpg.functions.export_pubkey(
             cls.gpg_key_0c8a17, cls.gnupg_home
         )
         sub_key = master_key["subkeys"][cls.gpg_key_d92439]
 
         # We need a gpg key without subkeys to test the normal scenario (M M M),
         # because keys with signing subkeys always use that subkey for signing.
-        master_key2 = securesystemslib.gpg.functions.export_pubkey(
+        master_key2 = securesystemslib._gpg.functions.export_pubkey(
             cls.gpg_key_768c43, cls.gnupg_home
         )
 
@@ -1400,7 +1400,7 @@ class TestInTotoVerifyThresholdsGpgSubkeys(
         # GPG will always use that subkey.
         # Even if gpg would use the masterkey, these scenarios are not allowed,
         # see table in docstring of testcase
-        signature = securesystemslib.gpg.functions.create_signature(
+        signature = securesystemslib._gpg.functions.create_signature(
             b"data", self.gpg_key_0c8a17, self.gnupg_home
         )
 
@@ -1452,7 +1452,7 @@ class TestInTotoVerifyThresholdsGpgSubkeys(
         layout = Layout(
             steps=[Step(name=self.step_name, pubkeys=[masterkey], threshold=2)],
             keys={
-                masterkey: securesystemslib.gpg.functions.export_pubkey(
+                masterkey: securesystemslib._gpg.functions.export_pubkey(
                     masterkey, self.gnupg_home
                 )
             },
@@ -1468,7 +1468,7 @@ class TestInTotoVerifyThresholdsGpgSubkeys(
 
         """
         expired_key_id = "e8ac80c924116dabb51d4b987cb07d6d2c199c7c"
-        expired_key = securesystemslib.gpg.functions.export_pubkey(
+        expired_key = securesystemslib._gpg.functions.export_pubkey(
             expired_key_id, self.gnupg_home
         )
 

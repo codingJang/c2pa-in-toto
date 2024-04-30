@@ -29,7 +29,7 @@ import argparse
 import logging
 import sys
 
-from securesystemslib.gpg import functions as gpg_interface
+from securesystemslib._gpg import functions as gpg_interface
 
 from in_toto import __version__, verifylib
 from in_toto.common_args import (

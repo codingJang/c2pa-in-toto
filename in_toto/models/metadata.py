@@ -27,9 +27,9 @@ from copy import deepcopy
 from typing import Union
 
 import attr
+import securesystemslib._gpg.functions
 import securesystemslib.exceptions
 import securesystemslib.formats
-import securesystemslib.gpg.functions
 from securesystemslib.dsse import Envelope as SSlibEnvelope
 from securesystemslib.exceptions import (
     UnverifiedSignatureError,
@@ -307,8 +307,8 @@ class Metablock(Metadata, ValidationMixin):
           default gpg home directory is used.
 
     Raises:
-      ValueError, OSError, securesystemslib.gpg.exceptions.CommandError, \
-            securesystemslib.gpg.exceptions.KeyNotFoundError:
+      ValueError, OSError, securesystemslib._gpg.exceptions.CommandError, \
+            securesystemslib._gpg.exceptions.KeyNotFoundError:
         gpg signing errors.
 
     Side Effects:
@@ -318,7 +318,7 @@ class Metablock(Metadata, ValidationMixin):
       The signature.
 
     """
-        signature = securesystemslib.gpg.functions.create_signature(
+        signature = securesystemslib._gpg.functions.create_signature(  # pylint: disable=protected-access
             self.signed.signable_bytes, gpg_keyid, gpg_home
         )
 
@@ -346,7 +346,7 @@ class Metablock(Metadata, ValidationMixin):
               key keyid, or the matching signature is malformed, or the matching
               signature is invalid.
 
-          securesystemslib.gpg.exceptions.KeyExpirationError: Passed verification
+          securesystemslib._gpg.exceptions.KeyExpirationError: Passed verification
               key is an expired gpg key.
 
         """
@@ -372,7 +372,7 @@ class Metablock(Metadata, ValidationMixin):
 
         valid = False
         if "signature" in signature and "other_headers" in signature:
-            valid = securesystemslib.gpg.functions.verify_signature(
+            valid = securesystemslib._gpg.functions.verify_signature(  # pylint: disable=protected-access
                 signature, verification_key, self.signed.signable_bytes
             )
 

@@ -27,7 +27,7 @@ import logging
 import sys
 from getpass import getpass
 
-from securesystemslib.gpg import functions as gpg_interface
+from securesystemslib._gpg import functions as gpg_interface
 
 from in_toto import __version__, exceptions
 from in_toto.common_args import (
