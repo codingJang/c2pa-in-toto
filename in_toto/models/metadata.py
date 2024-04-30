@@ -38,11 +38,7 @@ from securesystemslib.exceptions import (
 from securesystemslib.signer import Key, Signature, Signer
 
 from in_toto.exceptions import InvalidMetadata, SignatureVerificationError
-from in_toto.formats import (
-    _check_public_key,
-    _check_signature,
-    _check_signing_key,
-)
+from in_toto.formats import _check_public_key, _check_signature
 from in_toto.models._signer import GPGSigner
 from in_toto.models.common import Signable, ValidationMixin
 from in_toto.models.layout import Layout
@@ -294,38 +290,6 @@ class Metablock(Metadata, ValidationMixin):
     def create_signature(self, signer: Signer):
         signature = signer.sign(self.signed.signable_bytes)
         self.signatures.append(signature.to_dict())
-
-        return signature
-
-    def sign(self, key):
-        """Creates signature over signable with key and adds it to signatures.
-
-    Uses the UTF-8 encoded canonical JSON byte representation of the signable
-    attribute to create signatures deterministically.
-
-    Attributes:
-      key: A signing key.
-
-    Raises:
-      securesystemslib.exceptions.FormatError: Key argument is malformed.
-      securesystemslib.exceptions.CryptoError, \
-              securesystemslib.exceptions.UnsupportedAlgorithmError:
-          Signing errors.
-
-    Returns:
-      The signature.
-
-    .. deprecated:: 2.2.0
-        Please use ``Metablock.create_signature()`` instead.
-
-    """
-        _check_signing_key(key)
-
-        signature = securesystemslib.keys.create_signature(
-            key, self.signed.signable_bytes
-        )
-
-        self.signatures.append(signature)
 
         return signature
 
