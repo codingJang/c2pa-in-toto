@@ -100,7 +100,7 @@ key. It returns a non-zero value on failure and zero otherwise.""",
 Tag a git repo, storing files in CWD as products, signing the resulting link
 file with the private key loaded from 'key_file'.
 
-  {prog} -n tag -p . -k key_file -- git tag v1.0
+  {prog} -n tag -p . --signing-key key_file -- git tag v1.0
 
 
 Create a tarball, storing files in 'project' directory as materials and the
@@ -116,7 +116,7 @@ still generate signed attestations, e.g. for review work. In that case, files
 may be marked as materials for the manual review process and the command be
 omitted.
 
-  {prog} -n review -k key_file -m document.pdf -x
+  {prog} -n review --signing-key key_file -m document.pdf -x
 
 
 If an artifact that should be recorded is not in the current working directory
@@ -124,7 +124,7 @@ If an artifact that should be recorded is not in the current working directory
 Note that in this example only the relative path, 'document.pdf' is stored
 along with its hash in the resulting link metadata file.
 
-  {prog} -n review -k key_file -m document.pdf \\
+  {prog} -n review --signing-key key_file -m document.pdf \\
          --base-path /my/review/docs/ -x
 
 
@@ -132,7 +132,7 @@ Similarly, it is possible to pass the full path to the artifact that should
 be recorded together with a left-strip path, to only store a relative path,
 e.g. 'document.pdf'.
 
-  {prog} -n review -k key_file \\
+  {prog} -n review --signing-key key_file \\
          -m /tmp/my/review/docs/document.pdf \\
          --lstrip-paths /tmp/my/review/docs/ -x
 

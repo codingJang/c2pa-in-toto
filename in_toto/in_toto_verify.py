@@ -107,13 +107,13 @@ verification fails and 0 if verification passes. """,
 Verify supply chain in 'root.layout', signed with private part of
 'key_file.pub'.
 
-  {prog} --layout root.layout --layout-keys key_file.pub
+  {prog} --layout root.layout --verification-keys key_file.pub
 
 
 Verify supply chain as above but load links corresponding to steps of
 'root.layout' from 'link_dir'.
 
-  {prog} --layout root.layout --layout-keys key_file.pub \\
+  {prog} --layout root.layout --verification-keys key_file.pub \\
       --link-dir link_dir
 
 
@@ -184,9 +184,11 @@ for which the public part can be found in the GPG keyring at '~/.gnupg'.
         metavar="<path>",
         nargs="+",
         help=(
-            "replacement for '--layout-keys' using a standard "
-            "subjectPublicKeyInfo/PEM format. Key type is detected "
-            "automatically and need not be specified with '--key-type'."
+            "paths to public key files used to verify the passed root layout's"
+            " signatures. Supported keytypes are rsa, ed25519, ecdsa (nistp256)"
+            " in a standard subjectPublicKeyInfo/PEM format. Passing at least"
+            " one key using '--verification-keys' and/or '--gpg' is required."
+            " For each passed key the layout must carry a valid signature."
         ),
     )
 
@@ -198,7 +200,7 @@ for which the public part can be found in the GPG keyring at '~/.gnupg'.
         help=(
             "GPG keyid, identifying a public key in the GPG keyring used to verify"
             " the passed root layout's signatures."
-            " Passing at least one key using '--layout-keys' and/or '--gpg' is"
+            " Passing at least one key using '--verification-keys' and/or '--gpg' is"
             " required. For each passed key the layout must carry a valid"
             " signature."
         ),

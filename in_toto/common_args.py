@@ -114,7 +114,7 @@ KEY_PASSWORD_KWARGS = {
     "const": True,
     "metavar": "<password>",
     "help": (
-        "password for encrypted key specified with '--key'. Passing  '-P'"
+        "password for encrypted key specified with '--signing-key'. Passing '-P'"
         " without <password> opens a prompt. If no password is passed, or"
         " entered on the prompt, the key is treated as unencrypted. (Do "
         " not confuse with '-p/--products'!)"
@@ -146,7 +146,7 @@ GPG_KWARGS = {
         "GPG keyid to sign the resulting link metadata.  When '--gpg' is"
         " passed without the keyid, the default GPG key is used. The keyid"
         " prefix is used as an infix for the link metadata filename, i.e."
-        " '<name>.<keyid prefix>.link'. Passing one of '--key' or '--gpg'"
+        " '<name>.<keyid prefix>.link'. Passing one of '--signing-key' or '--gpg'"
         " is required."
     ),
 }
@@ -169,10 +169,9 @@ SIGNING_KEY_KWARGS = {
     "metavar": "<path>",
     "dest": "signing_key",
     "help": (
-        "replacement for '--key' using a standard PKCS8/PEM format. Key type is"
-        " detected automatically and need not be specified with '--key-type'."
-        " Use '--password [<password>]' to pass a decryption password"
-        " or toggle a prompt, if the key es encrypted."
+        "signing key in a standard PKCS8/PEM format. Supported keytypes are"
+        " rsa, ed25519, ecdsa (nistp256). Use '--password [<password>]' to pass"
+        " a decryption password or toggle a prompt, if the key es encrypted."
     ),
 }
 

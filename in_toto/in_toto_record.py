@@ -91,8 +91,8 @@ Create link metadata file in two commands, signing it with the private key
 loaded from 'key_file', recording all files in the CWD as materials (on
 start), and as products (on stop).
 
-  {prog} start -n edit-files -k path/to/key_file -m .
-  {prog} stop -n edit-files -k path/to/key_file -p .
+  {prog} start -n edit-files --signing-key path/to/key_file -m .
+  {prog} stop -n edit-files --signing-key path/to/key_file -p .
 
 
 Create link metadata file signed with the default GPG key from the default
@@ -106,8 +106,8 @@ Create link metadata file signed with the private key loaded from 'key_file',
 record all files in the CWD as material and product, and dump finished link
 file to the target directory (on stop).
 
-  {prog} start -n edit-files -k path/to/key_file -m .
-  {prog} stop -d path/to/target/dir -n edit-files -k path/to/key_file -p .
+  {prog} start -n edit-files --signing-key path/to/key_file -m .
+  {prog} stop -d path/to/target/dir -n edit-files --signing-key path/to/key_file -p .
 
 """.format(
         prog=parser.prog
