@@ -10,8 +10,8 @@ feature-rich, programmable alternative to the :doc:`command line tools
 
    **Cryptographic Signatures**
 
-   in-toto metadata is signed with cryptographic keys using the in-house crypto
-   library `securesystemslib <https://github.com/secure-systems-lab/securesystemslib>`_
+   in-toto metadata is signed with cryptographic keys via the *Signer API*
+   in `securesystemslib <https://github.com/secure-systems-lab/securesystemslib>`_
    Please refer to its `documentation <https://python-securesystemslib.readthedocs.io/en/latest/signer.html>`_
    for details about loading a `Signer` for "Evidence Generation".
 
