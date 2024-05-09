@@ -6,6 +6,14 @@ consume, modify and verify in-toto metadata. Detailed usage instructions for
 each tool, along with examples, are provided below.
 
 
+.. note::
+
+  **Cryptographic Signatures**
+
+  in-toto metadata is signed with cryptographic keys. The CLI accepts key files
+  in standard PEM format. See `in-toto#662 <https://github.com/in-toto/in-toto/issues/662>`_
+  for details about key generation.
+
 Evidence Generation
 -------------------
 

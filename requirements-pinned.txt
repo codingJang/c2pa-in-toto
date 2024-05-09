@@ -9,7 +9,6 @@ attrs==23.2.0
 cffi==1.16.0
     # via
     #   cryptography
-    #   pynacl
 cryptography==42.0.5
     # via securesystemslib
 iso8601==2.1.0
@@ -18,11 +17,9 @@ pathspec==0.12.1
     # via -r requirements.txt
 pycparser==2.22
     # via cffi
-pynacl==1.5.0
-    # via securesystemslib
 python-dateutil==2.9.0.post0
     # via -r requirements.txt
-securesystemslib[crypto,pynacl]==0.31.0
+securesystemslib[crypto]==0.31.0
     # via -r requirements.txt
 six==1.16.0
     # via python-dateutil

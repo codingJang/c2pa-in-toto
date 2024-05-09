@@ -39,7 +39,6 @@ from datetime import datetime
 import attr
 import securesystemslib.exceptions
 import securesystemslib.gpg.functions
-import securesystemslib.interface
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 

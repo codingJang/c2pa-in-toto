@@ -34,14 +34,7 @@ from pathlib import Path
 
 import securesystemslib.exceptions
 import securesystemslib.formats
-from securesystemslib.interface import (
-    generate_and_write_unencrypted_rsa_keypair,
-    import_ed25519_privatekey_from_file,
-    import_ed25519_publickey_from_file,
-    import_rsa_privatekey_from_file,
-    import_rsa_publickey_from_file,
-)
-from securesystemslib.signer import CryptoSigner, Signer
+from securesystemslib.signer import Signer
 
 import in_toto.exceptions
 import in_toto.settings
@@ -62,7 +55,7 @@ from in_toto.runlib import (
     in_toto_run,
     record_artifacts_as_dict,
 )
-from tests.common import TmpDirMixin
+from tests.common import SignerStore, TmpDirMixin
 
 
 def _apply_exclude_patterns(names, patterns):
@@ -732,10 +725,8 @@ class TestInTotoRun(unittest.TestCase, TmpDirMixin):
         cls.set_up_test_dir()
 
         cls.step_name = "test_step"
-        cls.key_path = "test_key"
-        generate_and_write_unencrypted_rsa_keypair(cls.key_path)
-        cls.key = import_rsa_privatekey_from_file(cls.key_path)
-        cls.key_pub = import_rsa_publickey_from_file(cls.key_path + ".pub")
+        cls.signer = SignerStore.rsa
+        cls.key = SignerStore.rsa_pub
 
         cls.test_artifact = "test_artifact"
         Path(cls.test_artifact).touch()
@@ -758,7 +749,12 @@ class TestInTotoRun(unittest.TestCase, TmpDirMixin):
     def test_in_toto_run_verify_signature(self):
         """Successfully run, verify signed metadata."""
         link = in_toto_run(
-            self.step_name, None, None, ["python", "--version"], True, self.key
+            self.step_name,
+            None,
+            None,
+            ["python", "--version"],
+            True,
+            signer=self.signer,
         )
         link.verify_signature(self.key)
 
@@ -808,7 +804,7 @@ class TestInTotoRun(unittest.TestCase, TmpDirMixin):
             [self.test_artifact],
             ["python", "--version"],
             True,
-            self.key,
+            signer=self.signer,
         )
         link_dump = Metablock.load(
             FILENAME_FORMAT.format(
@@ -827,7 +823,7 @@ class TestInTotoRun(unittest.TestCase, TmpDirMixin):
             [self.test_artifact],
             ["python", "--version"],
             True,
-            self.key,
+            signer=self.signer,
             metadata_directory=tmp_dir,
         )
         file_path = os.path.join(
@@ -849,7 +845,7 @@ class TestInTotoRun(unittest.TestCase, TmpDirMixin):
             [self.test_artifact],
             ["python", "--version"],
             True,
-            self.key,
+            signer=self.signer,
             metadata_directory=tmp_dir,
         )
         file_path = os.path.join(
@@ -866,7 +862,7 @@ class TestInTotoRun(unittest.TestCase, TmpDirMixin):
             [self.test_artifact],
             ["python", "--version"],
             True,
-            self.key,
+            signer=self.signer,
         )
         link_dump_without_md = Metablock.load(
             FILENAME_FORMAT.format(
@@ -947,18 +943,6 @@ class TestInTotoRun(unittest.TestCase, TmpDirMixin):
                 "this-is-not-a-key",
             )
 
-    def test_in_toto_wrong_key(self):
-        """Fail run, passed key is a public key."""
-        with self.assertRaises(securesystemslib.exceptions.FormatError):
-            in_toto_run(
-                self.step_name,
-                None,
-                None,
-                ["python", "--version"],
-                True,
-                self.key_pub,
-            )
-
     def test_nonexistent_directory(self):
         """Fail run, passed metadata_directory not exist."""
         with self.assertRaises(FileNotFoundError):
@@ -968,7 +952,7 @@ class TestInTotoRun(unittest.TestCase, TmpDirMixin):
                 None,
                 ["python", "--version"],
                 True,
-                self.key,
+                signer=self.signer,
                 metadata_directory="nonexistentDir",
             )
 
@@ -985,7 +969,7 @@ class TestInTotoRun(unittest.TestCase, TmpDirMixin):
                 None,
                 ["python", "--version"],
                 True,
-                self.key,
+                signer=self.signer,
                 metadata_directory=path,
             )
         os.remove(path)
@@ -1003,7 +987,7 @@ class TestInTotoRun(unittest.TestCase, TmpDirMixin):
                 None,
                 ["python", "--version"],
                 True,
-                self.key,
+                signer=self.signer,
                 metadata_directory=tmp_dir,
             )
         os.rmdir(tmp_dir)
@@ -1017,7 +1001,7 @@ class TestInTotoRun(unittest.TestCase, TmpDirMixin):
             None,
             ["python", "--version"],
             True,
-            self.key,
+            signer=self.signer,
             use_dsse=True,
         )
         self.assertIsInstance(link_metadata, Envelope)
@@ -1033,9 +1017,8 @@ class TestInTotoRecordStart(unittest.TestCase, TmpDirMixin):
         material, read key pair."""
         cls.set_up_test_dir()
 
-        cls.key_path = "test_key"
-        generate_and_write_unencrypted_rsa_keypair(cls.key_path)
-        cls.key = import_rsa_privatekey_from_file(cls.key_path)
+        cls.signer = SignerStore.rsa
+        cls.key = SignerStore.rsa_pub
 
         cls.step_name = "test_step"
         cls.link_name_unfinished = UNFINISHED_FILENAME_FORMAT.format(
@@ -1060,7 +1043,9 @@ class TestInTotoRecordStart(unittest.TestCase, TmpDirMixin):
 
     def test_create_unfinished_metadata_with_expected_material(self):
         """Test record start creates metadata with expected material."""
-        in_toto_record_start(self.step_name, [self.test_material], self.key)
+        in_toto_record_start(
+            self.step_name, [self.test_material], signer=self.signer
+        )
         link = Metablock.load(self.link_name_unfinished)
         self.assertEqual(
             list(link.signed.materials.keys()), [self.test_material]
@@ -1069,7 +1054,9 @@ class TestInTotoRecordStart(unittest.TestCase, TmpDirMixin):
 
     def test_create_unfinished_metadata_verify_signature(self):
         """Test record start creates metadata with expected signature."""
-        in_toto_record_start(self.step_name, [self.test_material], self.key)
+        in_toto_record_start(
+            self.step_name, [self.test_material], signer=self.signer
+        )
         link = Metablock.load(self.link_name_unfinished)
         link.verify_signature(self.key)
         os.remove(self.link_name_unfinished)
@@ -1080,7 +1067,6 @@ class TestInTotoRecordStart(unittest.TestCase, TmpDirMixin):
             in_toto_record_start(
                 self.step_name,
                 [],
-                signing_key=None,
                 gpg_keyid=None,
                 gpg_use_default=False,
             )
@@ -1088,7 +1074,10 @@ class TestInTotoRecordStart(unittest.TestCase, TmpDirMixin):
     def test_create_unfinished_metadata_using_dsse(self):
         """Test record start creates metadata using dsse."""
         in_toto_record_start(
-            self.step_name, [self.test_material], self.key, use_dsse=True
+            self.step_name,
+            [self.test_material],
+            signer=self.signer,
+            use_dsse=True,
         )
         link_metadata = Envelope.load(self.link_name_unfinished)
         link_metadata.verify_signature(self.key)
@@ -1104,12 +1093,10 @@ class TestInTotoRecordStop(unittest.TestCase, TmpDirMixin):
         and dummy product."""
         cls.set_up_test_dir()
 
-        cls.key_path = "test-key"
-        cls.key_path2 = "test-key2"
-        generate_and_write_unencrypted_rsa_keypair(cls.key_path)
-        generate_and_write_unencrypted_rsa_keypair(cls.key_path2)
-        cls.key = import_rsa_privatekey_from_file(cls.key_path)
-        cls.key2 = import_rsa_privatekey_from_file(cls.key_path2)
+        cls.signer = SignerStore.rsa
+        cls.key = SignerStore.rsa_pub
+        cls.signer2 = SignerStore.ecdsa
+        cls.key2 = SignerStore.ecdsa_pub
 
         cls.step_name = "test-step"
         cls.link_name = "{}.{:.8}.link".format(cls.step_name, cls.key["keyid"])
@@ -1126,8 +1113,10 @@ class TestInTotoRecordStop(unittest.TestCase, TmpDirMixin):
 
     def test_create_metadata_with_expected_product(self):
         """Test record stop records expected product."""
-        in_toto_record_start(self.step_name, [], self.key)
-        in_toto_record_stop(self.step_name, [self.test_product], self.key)
+        in_toto_record_start(self.step_name, [], signer=self.signer)
+        in_toto_record_stop(
+            self.step_name, [self.test_product], signer=self.signer
+        )
         link = Metablock.load(self.link_name)
         self.assertEqual(list(link.signed.products.keys()), [self.test_product])
         os.remove(self.link_name)
@@ -1136,18 +1125,20 @@ class TestInTotoRecordStop(unittest.TestCase, TmpDirMixin):
         """Test record stop with and without metadata directory,
         compare the expected product"""
         tmp_dir = os.path.realpath(tempfile.mkdtemp(dir=os.getcwd()))
-        in_toto_record_start(self.step_name, [], self.key)
+        in_toto_record_start(self.step_name, [], signer=self.signer)
         in_toto_record_stop(
             self.step_name,
             [self.test_product],
-            self.key,
+            signer=self.signer,
             metadata_directory=tmp_dir,
         )
         link_path = os.path.join(tmp_dir, self.link_name)
         link_with_md = Metablock.load(link_path)
 
-        in_toto_record_start(self.step_name, [], self.key)
-        in_toto_record_stop(self.step_name, [self.test_product], self.key)
+        in_toto_record_start(self.step_name, [], signer=self.signer)
+        in_toto_record_stop(
+            self.step_name, [self.test_product], signer=self.signer
+        )
         link_without_md = Metablock.load(self.link_name)
         self.assertEqual(link_with_md.signed, link_without_md.signed)
         os.remove(link_path)
@@ -1156,9 +1147,11 @@ class TestInTotoRecordStop(unittest.TestCase, TmpDirMixin):
     def test_create_metadata_with_expected_cwd(self):
         """Test record start/stop run, verify cwd."""
         in_toto_record_start(
-            self.step_name, [], self.key, record_environment=True
+            self.step_name, [], signer=self.signer, record_environment=True
         )
-        in_toto_record_stop(self.step_name, [self.test_product], self.key)
+        in_toto_record_stop(
+            self.step_name, [self.test_product], signer=self.signer
+        )
         link = Metablock.load(self.link_name)
         self.assertEqual(
             link.signed.environment["workdir"], os.getcwd().replace("\\", "/")
@@ -1167,16 +1160,16 @@ class TestInTotoRecordStop(unittest.TestCase, TmpDirMixin):
 
     def test_create_metadata_verify_signature(self):
         """Test record start creates metadata with expected signature."""
-        in_toto_record_start(self.step_name, [], self.key)
-        in_toto_record_stop(self.step_name, [], self.key)
+        in_toto_record_start(self.step_name, [], signer=self.signer)
+        in_toto_record_stop(self.step_name, [], signer=self.signer)
         link = Metablock.load(self.link_name)
         link.verify_signature(self.key)
         os.remove(self.link_name)
 
     def test_replace_unfinished_metadata(self):
         """Test record stop removes unfinished file and creates link file."""
-        in_toto_record_start(self.step_name, [], self.key)
-        in_toto_record_stop(self.step_name, [], self.key)
+        in_toto_record_start(self.step_name, [], signer=self.signer)
+        in_toto_record_stop(self.step_name, [], signer=self.signer)
         with self.assertRaises(IOError):
             # pylint: disable-next=consider-using-with
             open(self.link_name_unfinished, "r", encoding="utf8")
@@ -1186,14 +1179,14 @@ class TestInTotoRecordStop(unittest.TestCase, TmpDirMixin):
     def test_missing_unfinished_file(self):
         """Test record stop exits on missing unfinished file, no link recorded."""
         with self.assertRaises(IOError):
-            in_toto_record_stop(self.step_name, [], self.key)
+            in_toto_record_stop(self.step_name, [], signer=self.signer)
         with self.assertRaises(IOError):
             # pylint: disable-next=consider-using-with
             open(self.link_name, "r", encoding="utf8")
 
     def test_wrong_signature_in_unfinished_metadata(self):
         """Test record stop exits on wrong signature, no link recorded."""
-        in_toto_record_start(self.step_name, [], self.key)
+        in_toto_record_start(self.step_name, [], signer=self.signer)
         link_name = UNFINISHED_FILENAME_FORMAT.format(
             step_name=self.step_name, keyid=self.key["keyid"]
         )
@@ -1202,7 +1195,7 @@ class TestInTotoRecordStop(unittest.TestCase, TmpDirMixin):
         )
         os.rename(link_name, changed_link_name)
         with self.assertRaises(SignatureVerificationError):
-            in_toto_record_stop(self.step_name, [], self.key2)
+            in_toto_record_stop(self.step_name, [], signer=self.signer2)
         with self.assertRaises(IOError):
             # pylint: disable-next=consider-using-with
             open(self.link_name, "r", encoding="utf8")
@@ -1215,7 +1208,6 @@ class TestInTotoRecordStop(unittest.TestCase, TmpDirMixin):
             in_toto_record_stop(
                 self.step_name,
                 [],
-                signing_key=None,
                 gpg_keyid=None,
                 gpg_use_default=False,
             )
@@ -1234,10 +1226,16 @@ class TestInTotoRecordStop(unittest.TestCase, TmpDirMixin):
             # Call in_toto_record start and stop and record artifacts as
             # materials and products with line ending normalization on
             in_toto_record_start(
-                self.step_name, paths, self.key, normalize_line_endings=True
+                self.step_name,
+                paths,
+                signer=self.signer,
+                normalize_line_endings=True,
             )
             in_toto_record_stop(
-                self.step_name, paths, self.key, normalize_line_endings=True
+                self.step_name,
+                paths,
+                signer=self.signer,
+                normalize_line_endings=True,
             )
             link = Metablock.load(self.link_name).signed
 
@@ -1254,11 +1252,11 @@ class TestInTotoRecordStop(unittest.TestCase, TmpDirMixin):
     def test_nonexistent_directory(self):
         """Test record stop with nonexistent metadata directory"""
         with self.assertRaises(FileNotFoundError):
-            in_toto_record_start(self.step_name, [], self.key)
+            in_toto_record_start(self.step_name, [], signer=self.signer)
             in_toto_record_stop(
                 self.step_name,
                 [],
-                self.key,
+                signer=self.signer,
                 metadata_directory="nonexistentDir",
             )
 
@@ -1269,9 +1267,9 @@ class TestInTotoRecordStop(unittest.TestCase, TmpDirMixin):
         os.close(fd)
         # Windows will raise FileNotFoundError instead of NotADirectoryError
         with self.assertRaises((NotADirectoryError, FileNotFoundError)):
-            in_toto_record_start(self.step_name, [], self.key)
+            in_toto_record_start(self.step_name, [], signer=self.signer)
             in_toto_record_stop(
-                self.step_name, [], self.key, metadata_directory=path
+                self.step_name, [], signer=self.signer, metadata_directory=path
             )
         os.remove(path)
 
@@ -1282,16 +1280,23 @@ class TestInTotoRecordStop(unittest.TestCase, TmpDirMixin):
         # make the directory read only
         os.chmod(tmp_dir, stat.S_IREAD)
         with self.assertRaises(PermissionError):
-            in_toto_record_start(self.step_name, [], self.key)
+            in_toto_record_start(self.step_name, [], signer=self.signer)
             in_toto_record_stop(
-                self.step_name, [], self.key, metadata_directory=tmp_dir
+                self.step_name,
+                [],
+                signer=self.signer,
+                metadata_directory=tmp_dir,
             )
         os.rmdir(tmp_dir)
 
     def test_created_metadata_using_dsse(self):
         """Test record stop records created metadata with dsse."""
-        in_toto_record_start(self.step_name, [], self.key, use_dsse=True)
-        in_toto_record_stop(self.step_name, [self.test_product], self.key)
+        in_toto_record_start(
+            self.step_name, [], signer=self.signer, use_dsse=True
+        )
+        in_toto_record_stop(
+            self.step_name, [self.test_product], signer=self.signer
+        )
 
         link_metadata = Envelope.load(self.link_name)
         link_metadata.verify_signature(self.key)
@@ -1315,12 +1320,12 @@ class TestInTotoRecordStop(unittest.TestCase, TmpDirMixin):
         }
 
         in_toto_record_start(
-            self.step_name, [], self.key, record_environment=True
+            self.step_name, [], signer=self.signer, record_environment=True
         )
         in_toto_record_stop(
             self.step_name,
             [self.test_product],
-            self.key,
+            signer=self.signer,
             command=command,
             byproducts=byproducts,
             environment=environment,
@@ -1408,17 +1413,12 @@ class TestSigner(unittest.TestCase, TmpDirMixin):
     @classmethod
     def setUpClass(cls):
         cls.set_up_test_dir()  # teardown is called implicitly
-        keys = Path(__file__).parent / "demo_files"
 
-        rsa = "alice"
-        rsa_priv = import_rsa_privatekey_from_file(str(keys / rsa))
-        cls.rsa_pub = import_rsa_publickey_from_file(str(keys / f"{rsa}.pub"))
-        cls.rsa_signer = CryptoSigner.from_securesystemslib_key(rsa_priv)
+        cls.rsa_pub = SignerStore.rsa_pub
+        cls.rsa_signer = SignerStore.rsa
 
-        ed = "danny"
-        ed_priv = import_ed25519_privatekey_from_file(str(keys / ed))
-        cls.ed_pub = import_ed25519_publickey_from_file(str(keys / f"{ed}.pub"))
-        cls.ed_signer = CryptoSigner.from_securesystemslib_key(ed_priv)
+        cls.ed_pub = SignerStore.ed25519_pub
+        cls.ed_signer = SignerStore.ed25519
 
     def test_run(self):
         # Successfully create, sign and verify link

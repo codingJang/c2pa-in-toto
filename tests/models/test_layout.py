@@ -249,49 +249,20 @@ class TestLayoutValidator(unittest.TestCase):
 
     def test_wrong_key_dictionary(self):
         """Test that the keys dictionary is properly populated."""
-        rsa_key_one = securesystemslib.keys.generate_rsa_key()
-        rsa_key_two = securesystemslib.keys.generate_rsa_key()
-
-        # FIXME: attr.ib reutilizes the default dictionary, so future constructor
-        # are not empty...
-        self.layout.keys = {"kek": rsa_key_one}
-        with self.assertRaises(securesystemslib.exceptions.FormatError):
-            self.layout._validate_keys()
-
-        with self.assertRaises(securesystemslib.exceptions.FormatError):
-            self.layout.validate()
-
-        self.layout.keys = {}
-        self.layout.keys[rsa_key_two["keyid"]] = "kek"
-        with self.assertRaises(securesystemslib.exceptions.FormatError):
-            self.layout._validate_keys()
-
-        with self.assertRaises(securesystemslib.exceptions.FormatError):
-            self.layout.validate()
-
         # ... more invalid keys
         for invalid_keys in [
             False,  # must be a dict
             {1234: {}},  # keyid must be string
             {"xyz": {}},  # keyid must be hex
+            {"deadbeef": "key must be a dict"},
             {"deadbeef": {"missing": "'keyval' field"}},
         ]:
             self.layout.keys = invalid_keys
             with self.assertRaises(securesystemslib.exceptions.FormatError):
                 self.layout._validate_keys()
 
-        self.layout.keys[rsa_key_two["keyid"]] = "kek"
-        with self.assertRaises(securesystemslib.exceptions.FormatError):
-            self.layout.validate()
-
-        self.layout.keys = {}
-        del rsa_key_one["keyval"]["private"]
-        del rsa_key_two["keyval"]["private"]
-        self.layout.keys[rsa_key_one["keyid"]] = rsa_key_one
-        self.layout.keys[rsa_key_two["keyid"]] = rsa_key_two
-
-        self.layout._validate_keys()
-        self.layout.validate()
+            with self.assertRaises(securesystemslib.exceptions.FormatError):
+                self.layout.validate()
 
     def test_wrong_steps_list(self):
         """Check that the validate method checks the steps' correctness."""
@@ -356,12 +327,14 @@ class TestLayoutValidator(unittest.TestCase):
         self.layout.validate()
 
     def test_import_step_metadata_wrong_type(self):
-        functionary_key = securesystemslib.keys.generate_rsa_key()
         name = "name"
+        functionary_keyid = (
+            "776a00e29f3559e0141b3b096f696abc6cfb0c657ab40f441132b345b08453f5"
+        )
 
         # Create and dump a link file with a wrong type
         link_name = in_toto.models.link.FILENAME_FORMAT.format(
-            step_name=name, keyid=functionary_key["keyid"]
+            step_name=name, keyid=functionary_keyid
         )
 
         link_path = os.path.abspath(link_name)
@@ -371,9 +344,7 @@ class TestLayoutValidator(unittest.TestCase):
         metadata.dump(link_path)
 
         # Add the single step to the test layout and try to read the failing link
-        self.layout.steps.append(
-            Step(name=name, pubkeys=[functionary_key["keyid"]])
-        )
+        self.layout.steps.append(Step(name=name, pubkeys=[functionary_keyid]))
 
         with self.assertRaises(securesystemslib.exceptions.FormatError):
             in_toto.verifylib.load_links_for_layout(self.layout, ".")

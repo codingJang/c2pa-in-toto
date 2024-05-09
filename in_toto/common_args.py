@@ -30,12 +30,6 @@
 """
 import sys
 
-from in_toto import (
-    KEY_TYPE_ECDSA,
-    KEY_TYPE_ED25519,
-    KEY_TYPE_RSA,
-    SUPPORTED_KEY_TYPES,
-)
 from in_toto.settings import LINK_CMD_EXEC_TIMEOUT
 
 EXCLUDE_ARGS = ["--exclude"]
@@ -80,41 +74,13 @@ LSTRIP_PATHS_KWARGS = {
     ),
 }
 
-KEY_ARGS = ["-k", "--key"]
-KEY_KWARGS = {
-    "type": str,
-    "metavar": "<path>",
-    "help": (
-        "path to a private key file to sign the resulting link metadata."
-        " The keyid prefix is used as an infix for the link metadata"
-        " filename, i.e. '<name>.<keyid prefix>.link'. See '--key-type' for"
-        " available formats. Passing one of '--key' or '--gpg' is required."
-    ),
-}
-
-KEY_TYPE_ARGS = ["-t", "--key-type"]
-KEY_TYPE_KWARGS = {
-    "dest": "key_type",
-    "type": str,
-    "choices": SUPPORTED_KEY_TYPES,
-    "default": KEY_TYPE_RSA,
-    "help": (
-        "type of key specified by the '--key' option. '{rsa}' keys are"
-        " expected in a 'PEM' format. '{ed25519}' and '{ecdsa}' are"
-        " expected to be in a custom 'securesystemslib/json' format."
-        " Default is '{rsa}'.".format(
-            rsa=KEY_TYPE_RSA, ed25519=KEY_TYPE_ED25519, ecdsa=KEY_TYPE_ECDSA
-        )
-    ),
-}
-
 KEY_PASSWORD_ARGS = ["-P", "--password"]
 KEY_PASSWORD_KWARGS = {
     "nargs": "?",
     "const": True,
     "metavar": "<password>",
     "help": (
-        "password for encrypted key specified with '--key'. Passing  '-P'"
+        "password for encrypted key specified with '--signing-key'. Passing '-P'"
         " without <password> opens a prompt. If no password is passed, or"
         " entered on the prompt, the key is treated as unencrypted. (Do "
         " not confuse with '-p/--products'!)"
@@ -146,7 +112,7 @@ GPG_KWARGS = {
         "GPG keyid to sign the resulting link metadata.  When '--gpg' is"
         " passed without the keyid, the default GPG key is used. The keyid"
         " prefix is used as an infix for the link metadata filename, i.e."
-        " '<name>.<keyid prefix>.link'. Passing one of '--key' or '--gpg'"
+        " '<name>.<keyid prefix>.link'. Passing one of '--signing-key' or '--gpg'"
         " is required."
     ),
 }
@@ -169,10 +135,9 @@ SIGNING_KEY_KWARGS = {
     "metavar": "<path>",
     "dest": "signing_key",
     "help": (
-        "replacement for '--key' using a standard PKCS8/PEM format. Key type is"
-        " detected automatically and need not be specified with '--key-type'."
-        " Use '--password [<password>]' to pass a decryption password"
-        " or toggle a prompt, if the key es encrypted."
+        "signing key in a standard PKCS8/PEM format. Supported keytypes are"
+        " rsa, ed25519, ecdsa (nistp256). Use '--password [<password>]' to pass"
+        " a decryption password or toggle a prompt, if the key is encrypted."
     ),
 }
 
