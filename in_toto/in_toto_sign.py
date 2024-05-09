@@ -27,7 +27,7 @@ import logging
 import sys
 from getpass import getpass
 
-from securesystemslib.gpg import functions as gpg_interface
+from securesystemslib._gpg import functions as gpg_interface
 
 from in_toto import __version__, exceptions
 from in_toto.common_args import (
@@ -72,7 +72,7 @@ def _sign_and_dump_metadata(metadata, args):
 
     try:
         if not args.append:
-            metadata.signatures = []
+            metadata.signatures.clear()
 
         signature = None
         # If the cli tool was called with `--gpg [KEYID ...]` `args.gpg` is

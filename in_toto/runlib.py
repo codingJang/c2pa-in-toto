@@ -37,11 +37,11 @@ import tempfile
 import time
 from collections import defaultdict
 
+import securesystemslib._gpg
 import securesystemslib.exceptions
 import securesystemslib.formats
-import securesystemslib.gpg
 import securesystemslib.hash
-from securesystemslib.signer import Key, Signature, Signer
+from securesystemslib.signer import Signer
 
 import in_toto.exceptions
 import in_toto.settings
@@ -394,13 +394,6 @@ def _check_signer(signer):
     if not isinstance(signer, Signer):
         raise ValueError("signer must be a Signer instance")
 
-    if not (
-        hasattr(signer, "public_key") and isinstance(signer.public_key, Key)
-    ):
-        # TODO: add `public_key` to `Signer` interface upstream
-        # see secure-systems-lab/securesystemslib#605
-        raise ValueError("only Signer instances with public key supported")
-
 
 def _require_signing_arg(signer, gpg_keyid, gpg_use_default):
     if not any([signer, gpg_keyid, gpg_use_default]):
@@ -513,8 +506,8 @@ def in_toto_run(
             securesystemslib.exceptions.UnsupportedAlgorithmError:
         Signing errors.
 
-    ValueError, OSError, securesystemslib.gpg.exceptions.CommandError, \
-            securesystemslib.gpg.exceptions.KeyNotFoundError:
+    ValueError, OSError, securesystemslib._gpg.exceptions.CommandError, \
+            securesystemslib._gpg.exceptions.KeyNotFoundError:
         gpg signing errors.
 
   Side Effects:
@@ -710,8 +703,8 @@ def in_toto_record_start(
             securesystemslib.exceptions.UnsupportedAlgorithmError:
         Signing errors.
 
-    ValueError, OSError, securesystemslib.gpg.exceptions.CommandError, \
-            securesystemslib.gpg.exceptions.KeyNotFoundError:
+    ValueError, OSError, securesystemslib._gpg.exceptions.CommandError, \
+            securesystemslib._gpg.exceptions.KeyNotFoundError:
         gpg signing errors.
 
   Side Effects:
@@ -898,8 +891,8 @@ def in_toto_record_stop(
             securesystemslib.exceptions.UnsupportedAlgorithmError:
         Signing errors.
 
-    ValueError, OSError, securesystemslib.gpg.exceptions.CommandError, \
-            securesystemslib.gpg.exceptions.KeyNotFoundError:
+    ValueError, OSError, securesystemslib._gpg.exceptions.CommandError, \
+            securesystemslib._gpg.exceptions.KeyNotFoundError:
         gpg signing errors.
 
   Side Effects:
@@ -978,7 +971,7 @@ def in_toto_record_stop(
 
     elif gpg_keyid:
         LOG.info("Verifying preliminary link signature using passed gpg key...")
-        gpg_pubkey = securesystemslib.gpg.functions.export_pubkey(
+        gpg_pubkey = securesystemslib._gpg.functions.export_pubkey(  # pylint: disable=protected-access
             gpg_keyid, gpg_home
         )
         keyid = gpg_pubkey["keyid"]
@@ -994,13 +987,17 @@ def in_toto_record_stop(
         LOG.info(
             "Verifying preliminary link signature using default gpg key..."
         )
-        # signatures are objects in DSSE.
-        sig = link_metadata.signatures[0]
-        if isinstance(sig, Signature):
-            keyid = sig.keyid
+
+        # The `signatures` field is not part of the common Envelope/Metablock
+        # interface, so we need to case handle. Note that we shouldn't be
+        # accessing `signatures` here in the first place (see FIXME above).
+        if isinstance(link_metadata, Envelope):
+            keyid = link_metadata.signatures.values()[0].keyid
+
         else:
-            keyid = sig["keyid"]
-        gpg_pubkey = securesystemslib.gpg.functions.export_pubkey(
+            keyid = link_metadata.signatures[0]["keyid"]
+
+        gpg_pubkey = securesystemslib._gpg.functions.export_pubkey(  # pylint: disable=protected-access
             keyid, gpg_home
         )
         verification_key = gpg_pubkey

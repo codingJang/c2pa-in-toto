@@ -22,8 +22,8 @@
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
-import securesystemslib.gpg.exceptions as gpg_exceptions
-import securesystemslib.gpg.functions as gpg
+import securesystemslib._gpg.exceptions as gpg_exceptions
+import securesystemslib._gpg.functions as gpg
 from cryptography.hazmat.primitives.serialization import (
     load_pem_private_key,
     load_pem_public_key,
@@ -137,6 +137,10 @@ class GPGSigner(Signer):
         self.keyid = keyid
         self.homedir = homedir
 
+    @property
+    def public_key(self) -> Key:
+        raise NotImplementedError  # pragma: no cover
+
     @classmethod
     def from_priv_key_uri(
         cls,
@@ -163,9 +167,9 @@ class GPGSigner(Signer):
           OSError: the gpg command is not present or non-executable.
           securesystemslib.exceptions.UnsupportedLibraryError: the gpg command is
             not available, or the cryptography library is not installed.
-          securesystemslib.gpg.exceptions.CommandError: the gpg command returned a
+          securesystemslib._gpg.exceptions.CommandError: the gpg command returned a
             non-zero exit code.
-          securesystemslib.gpg.exceptions.KeyNotFoundError: the used gpg version is
+          securesystemslib._gpg.exceptions.KeyNotFoundError: the used gpg version is
             not fully supported and no public key can be found for short keyid.
           Returns:
             Returns a ``GPGSignature`` class instance.

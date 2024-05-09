@@ -34,7 +34,6 @@ from pathlib import Path
 
 import securesystemslib.exceptions
 import securesystemslib.formats
-from securesystemslib.signer import Signer
 
 import in_toto.exceptions
 import in_toto.settings
@@ -1435,39 +1434,6 @@ class TestSigner(unittest.TestCase, TmpDirMixin):
 
         with self.assertRaises(ValueError):
             link = in_toto_run("foo", [], [], [], signer=NoSigner())
-
-        # Fail with incompatible signers
-        class BadSigner(Signer):
-            """Signer implementation w/o public_key attribute.
-            secure-systems-lab/securesystemslib#605
-            """
-
-            @classmethod
-            def from_priv_key_uri(
-                cls,
-                priv_key_uri,
-                public_key,
-                secrets_handler=None,
-            ):
-                pass
-
-            def sign(self, payload):
-                pass
-
-        # Fail with missing public_key attribute.
-        bad_signer = BadSigner()
-        with self.assertRaises(ValueError):
-            link = in_toto_run("foo", [], [], [], signer=bad_signer)
-
-        class NoKey:
-            pass
-
-        # Fail with wrong tpe on public_key attribute
-        bad_signer.public_key = (  # pylint: disable=attribute-defined-outside-init
-            NoKey()
-        )
-        with self.assertRaises(ValueError):
-            link = in_toto_run("foo", [], [], [], signer=bad_signer)
 
     def test_record(self):
         # Successfully create, sign and verify link

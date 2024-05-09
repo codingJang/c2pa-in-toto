@@ -26,7 +26,7 @@ import shutil
 import unittest
 from pathlib import Path
 
-from securesystemslib.gpg.constants import have_gpg
+from securesystemslib._gpg.constants import have_gpg
 
 from in_toto.in_toto_verify import main as in_toto_verify_main
 from in_toto.models._signer import load_crypto_signer_from_pkcs8_file

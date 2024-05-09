@@ -37,8 +37,8 @@ import shlex
 from datetime import datetime
 
 import attr
+import securesystemslib._gpg.functions
 import securesystemslib.exceptions
-import securesystemslib.gpg.functions
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 
@@ -340,7 +340,7 @@ class Layout(Signable):
 
         Raises:
           securesystemslib.exceptions.FormatError: Arguments are malformed.
-          securesystemslib.gpg.execeptions.KeyNotFoundError: Key cannot be found.
+          securesystemslib._gpg.execeptions.KeyNotFoundError: Key cannot be found.
 
         Side Effects:
           Calls system gpg command in a subprocess.
@@ -353,7 +353,7 @@ class Layout(Signable):
         if gpg_home:  # pragma: no branch
             _check_str(gpg_home)
 
-        key = securesystemslib.gpg.functions.export_pubkey(
+        key = securesystemslib._gpg.functions.export_pubkey(  # pylint: disable=protected-access
             gpg_keyid, homedir=gpg_home
         )
         return self.add_functionary_key(key)
@@ -392,7 +392,7 @@ class Layout(Signable):
 
         Raises:
           securesystemslib.exceptions.FormatError: Arguments are malformed.
-          securesystemslib.gpg.execeptions.KeyNotFoundError: A key cannot be found.
+          securesystemslib._gpg.execeptions.KeyNotFoundError: A key cannot be found.
 
         Side Effects:
           Calls system gpg command in a subprocess.
