@@ -3,8 +3,7 @@
 ## v3.0.0
 
 This release, most notably, marks stable securesystemslib v1.0.0 as minimum
-requirement. The update requires the previously announced removal of deprecated
-CLI/API arguments (see below).
+requirement, and, as a consequence, removes the recently deprecated CLI/API arguments (see below).
 
 ### Changed
 Update securesystemslib v1.0.0 (#740)
