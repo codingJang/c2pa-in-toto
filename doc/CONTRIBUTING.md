@@ -35,8 +35,8 @@ tox
 
 This will execute the entire test suite in a separate virtual environment for each supported Python version.
 
-## Additional Testing
-### Manual Testing
+
+#### Manual Testing
 You can also run individual tests or the test suite manually if needed:
 
 ```sh
@@ -47,7 +47,7 @@ python <test_file.py>
 python runtests.py
 ```
 
-## Code Formatting
+#### Code Formatting
 Ensure that your code follows the required formatting standards by using black and isort:
 
 ```sh
