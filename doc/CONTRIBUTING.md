@@ -19,8 +19,9 @@ Navigate to the project root directory and install development dependencies usin
 pip install -r requirements-dev.txt
 ```
 
-### 3. Review Contribution Guidelines
-Before contributing, please review our [contribution guidelines](https://github.com/in-toto/in-toto?tab=readme-ov-file#governance-and-contributing) to ensure that your code follows our style guidelines and is properly tested.
+### 3. Governance and Contributing 
+ For information about in-toto's governance and contributing guidelines, see 
+ [GOVERNANCE.md](https://github.com/in-toto/in-toto/blob/659942bde1cd732b0b9449445f9769b2def6aeb1/GOVERNANCE.md) and [CONTRIBUTING.md]( https://github.com/in-toto/in-toto?tab=readme-ov-file#governance-and-contributing).
 
 ### 4. Sign the Developer Certificate of Origin (DCO)
 All contributors must sign the Developer Certificate of Origin (DCO) by adding a "Signed-off-by" line to their commit messages. This indicates your acceptance of the DCO. You can do this by appending the following line to each commit message (see [git commit –signoff](https://git-scm.com/docs/git-commit#Documentation/git-commit.txt---signoff)):
