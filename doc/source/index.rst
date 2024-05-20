@@ -17,3 +17,4 @@ found at `in-toto.io <https://in-toto.io>`_.
    configuration
    layout-creation-example
    Demo Supply Chain <https://github.com/in-toto/demo>
+   CONTRIBUTING
