@@ -152,8 +152,8 @@ See [SECURITY.md](SECURITY.md).
 
 ## Governance and Contributing
 
-For information about in-toto's governance and contributing guidelines, see
-[GOVERNANCE.md](GOVERNANCE.md).
+ For information about in-toto's governance and contributing guidelines, see 
+ [GOVERNANCE.md](GOVERNANCE.md) and [CONTRIBUTING.md](doc/source/CONTRIBUTING.md).
 
 ## Acknowledgments
 This project is managed by Prof. Santiago Torres-Arias at Purdue University.
