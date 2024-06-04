@@ -149,9 +149,9 @@ class Envelope(SSlibEnvelope, Metadata):
         """Creates DSSE envelope with signable bytes as payload.
 
         Note:
-        The method accepts a `Signable` because it serves as a base class 
+        The method accepts a `Signable` because it serves as a base class
         for `Link` and `Layout`.
-        This method intentionally avoid using `Signable.signable_bytes` to 
+        This method intentionally avoid using `Signable.signable_bytes` to
         prevent canonicalization, which is contrary to DSSE's design principles.
         Instead, this method serializes the `Signable` using regular JSON.
 
