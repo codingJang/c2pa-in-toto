@@ -146,13 +146,31 @@ class Envelope(SSlibEnvelope, Metadata):
 
     @classmethod
     def from_signable(cls, signable: Signable) -> "Envelope":
-        """Creates DSSE envelope with signable bytes as payload."""
+        """Creates DSSE envelope with signable bytes as payload.
 
+        Note:
+        The method accepts a `Signable` because it serves as a base class
+        for `Link` and `Layout`.
+        This method intentionally avoids using `Signable.signable_bytes` to
+        prevent canonicalization, which is contrary to DSSE's design principles.
+        Instead, this method serializes the `Signable` using regular JSON.
+
+        Arguments:
+            signable (Signable): The object to be signed. This object is expected
+                to be compatible with `Signable`, but its `signable_bytes` property
+                will not be used.
+
+        Returns:
+            Envelope: An envelope containing the serialized signable object.
+        """
+
+        # Serialize the signable object to JSON bytes without canonicalization
         json_bytes = json.dumps(
             attr.asdict(signable),
             sort_keys=True,
         ).encode("utf-8")
 
+        # Create and return the envelope
         return cls(
             payload=json_bytes,
             payload_type=ENVELOPE_PAYLOAD_TYPE,
