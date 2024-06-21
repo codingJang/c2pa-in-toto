@@ -83,3 +83,7 @@ html_favicon = "in-toto-icon-color.png"
 todo_include_todos = True
 
 napoleon_custom_sections = [("Side Effects", "returns_style")]
+
+rst_prolog = """
+:github_url: https://github.com/in-toto/in-toto/blob/develop/doc/source/CONTRIBUTING.md#build-documentation
+"""
