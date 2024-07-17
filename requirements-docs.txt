@@ -3,5 +3,6 @@
 
 # sphinx extensions
 sphinx-rtd-theme
-sphinx-argparse
+# TODO: Unpin dependency with sphinx-doc/sphinx-argparse#56
+sphinx-argparse<0.5.0
 recommonmark
