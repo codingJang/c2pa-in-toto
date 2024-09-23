@@ -59,6 +59,7 @@ from in_toto.resolver import (
     DirectoryResolver,
     FileResolver,
     OSTreeResolver,
+    C2PAResolver,
     Resolver,
 )
 
@@ -182,6 +183,8 @@ def record_artifacts_as_dict(
         normalize_line_endings=normalize_line_endings,
         lstrip_paths=lstrip_paths,
     )
+
+    RESOLVER_FOR_URI_SCHEME[C2PAResolver.SCHEME] = C2PAResolver()
 
     # Aggregate artifacts per resolver
     resolver_for_uris = defaultdict(list)

@@ -379,3 +379,4 @@ class DirectoryResolver(Resolver):
             hashes[name] = self._hash(file_hashes)
 
         return hashes
+

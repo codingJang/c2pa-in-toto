@@ -22,3 +22,6 @@ from in_toto.resolver._resolver import (
     OSTreeResolver,
     Resolver,
 )
+
+from in_toto.resolver._c2pa_resolver import C2PAResolver
+
