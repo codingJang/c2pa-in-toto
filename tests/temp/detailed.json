@@ -1,0 +1,131 @@
+{
+  "active_manifest": "urn:uuid:93582c02-3a4f-40b5-a20e-55cfe0adfdcf",
+  "manifests": {
+    "urn:uuid:93582c02-3a4f-40b5-a20e-55cfe0adfdcf": {
+      "claim": {
+        "dc:title": "Do Not Train Example",
+        "dc:format": "image/jpeg",
+        "instanceID": "xmp:iid:7003a128-b1f3-4220-ace7-423afa32287d",
+        "claim_generator": "python_test/0.1 c2pa-rs/0.32.7",
+        "claim_generator_info": [
+          {
+            "name": "python_test",
+            "version": "0.1"
+          },
+          {
+            "name": "c2pa-rs",
+            "version": "0.32.7"
+          }
+        ],
+        "signature": "self#jumbf=c2pa.signature",
+        "assertions": [
+          {
+            "url": "self#jumbf=c2pa.assertions/c2pa.thumbnail.claim.jpeg",
+            "hash": "LaGwQRL+WkqiIqYZ2iY3qMgtFFYhDQmy6i2Z0kRskMk="
+          },
+          {
+            "url": "self#jumbf=c2pa.assertions/c2pa.thumbnail.ingredient.jpeg",
+            "hash": "I3B1p8JGVeKZF7dWVfk0bVa39qiz/95fFc+AOzgDutM="
+          },
+          {
+            "url": "self#jumbf=c2pa.assertions/c2pa.ingredient",
+            "hash": "zTb46rJAlPPMD+eGI9/cwKGMojvLNJtkgnBNI4SLMh8="
+          },
+          {
+            "url": "self#jumbf=c2pa.assertions/c2pa.training-mining",
+            "hash": "rqIucLjQuxVwvr8tuEedGBTUOlwbTGNz0eWAxOtmdac="
+          },
+          {
+            "url": "self#jumbf=c2pa.assertions/c2pa.hash.data",
+            "hash": "bsqmRS21MXDbNAkMQMmy0IvGqI1ehLz7iFDthsLGN7w="
+          }
+        ],
+        "alg": "sha256"
+      },
+      "assertion_store": {
+        "c2pa.training-mining": {
+          "entries": {
+            "c2pa.ai_training": {
+              "use": "notAllowed"
+            },
+            "c2pa.data_mining": {
+              "use": "notAllowed"
+            },
+            "c2pa.ai_inference": {
+              "use": "notAllowed"
+            },
+            "c2pa.ai_generative_training": {
+              "use": "notAllowed"
+            }
+          }
+        },
+        "c2pa.ingredient": {
+          "dc:title": "A.jpg",
+          "dc:format": "jpg",
+          "instanceID": "xmp:iid:fc58a26e-95b2-44ed-a13c-a9c92def2109",
+          "relationship": "parentOf",
+          "thumbnail": {
+            "url": "self#jumbf=c2pa.assertions/c2pa.thumbnail.ingredient.jpeg",
+            "hash": "I3B1p8JGVeKZF7dWVfk0bVa39qiz/95fFc+AOzgDutM="
+          }
+        },
+        "c2pa.thumbnail.ingredient.jpeg": "<omitted> len = 1149",
+        "c2pa.hash.data": {
+          "exclusions": [
+            {
+              "start": 20,
+              "length": 16431
+            }
+          ],
+          "name": "jumbf manifest",
+          "alg": "sha256",
+          "hash": "a04ATPwWsgipEa57BGpWKIjjL+b9kUbfyOp8X7MoUWc=",
+          "pad": "<omitted>"
+        },
+        "c2pa.thumbnail.claim.jpeg": "<omitted> len = 1149"
+      },
+      "signature": {
+        "alg": "ps256",
+        "issuer": "My Organization",
+        "time": "2024-09-23T06:12:35+00:00"
+      }
+    }
+  },
+  "validation_status": [
+    {
+      "code": "claimSignature.mismatch",
+      "url": "self#jumbf=/c2pa/urn:uuid:93582c02-3a4f-40b5-a20e-55cfe0adfdcf/c2pa.signature",
+      "explanation": "claim signature is not valid"
+    },
+    {
+      "code": "assertion.hashedURI.match",
+      "url": "self#jumbf=c2pa.assertions/c2pa.thumbnail.claim.jpeg",
+      "explanation": "hashed uri matched: self#jumbf=c2pa.assertions/c2pa.thumbnail.claim.jpeg"
+    },
+    {
+      "code": "assertion.hashedURI.match",
+      "url": "self#jumbf=c2pa.assertions/c2pa.thumbnail.ingredient.jpeg",
+      "explanation": "hashed uri matched: self#jumbf=c2pa.assertions/c2pa.thumbnail.ingredient.jpeg"
+    },
+    {
+      "code": "assertion.hashedURI.match",
+      "url": "self#jumbf=c2pa.assertions/c2pa.ingredient",
+      "explanation": "hashed uri matched: self#jumbf=c2pa.assertions/c2pa.ingredient"
+    },
+    {
+      "code": "assertion.hashedURI.match",
+      "url": "self#jumbf=c2pa.assertions/c2pa.training-mining",
+      "explanation": "hashed uri matched: self#jumbf=c2pa.assertions/c2pa.training-mining"
+    },
+    {
+      "code": "assertion.hashedURI.match",
+      "url": "self#jumbf=c2pa.assertions/c2pa.hash.data",
+      "explanation": "hashed uri matched: self#jumbf=c2pa.assertions/c2pa.hash.data"
+    },
+    {
+      "code": "assertion.dataHash.match",
+      "url": "self#jumbf=/c2pa/urn:uuid:93582c02-3a4f-40b5-a20e-55cfe0adfdcf/c2pa.assertions/c2pa.hash.data",
+      "explanation": "data hash valid"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "active_manifest": "urn:uuid:93582c02-3a4f-40b5-a20e-55cfe0adfdcf",
+  "manifests": {
+    "urn:uuid:93582c02-3a4f-40b5-a20e-55cfe0adfdcf": {
+      "claim_generator": "python_test/0.1 c2pa-rs/0.32.7",
+      "claim_generator_info": [
+        {
+          "name": "python_test",
+          "version": "0.1"
+        },
+        {
+          "name": "c2pa-rs",
+          "version": "0.32.7"
+        }
+      ],
+      "title": "Do Not Train Example",
+      "format": "image/jpeg",
+      "instance_id": "xmp:iid:7003a128-b1f3-4220-ace7-423afa32287d",
+      "thumbnail": {
+        "format": "image/jpeg",
+        "identifier": "urn_uuid_93582c02-3a4f-40b5-a20e-55cfe0adfdcf/c2pa.assertions/c2pa.thumbnail.claim.jpeg"
+      },
+      "ingredients": [
+        {
+          "title": "A.jpg",
+          "format": "jpg",
+          "instance_id": "xmp:iid:fc58a26e-95b2-44ed-a13c-a9c92def2109",
+          "thumbnail": {
+            "format": "image/jpeg",
+            "identifier": "urn_uuid_93582c02-3a4f-40b5-a20e-55cfe0adfdcf/c2pa.assertions/c2pa.thumbnail.ingredient.jpeg"
+          },
+          "relationship": "parentOf"
+        }
+      ],
+      "assertions": [
+        {
+          "label": "c2pa.training-mining",
+          "data": {
+            "entries": {
+              "c2pa.ai_training": {
+                "use": "notAllowed"
+              },
+              "c2pa.data_mining": {
+                "use": "notAllowed"
+              },
+              "c2pa.ai_inference": {
+                "use": "notAllowed"
+              },
+              "c2pa.ai_generative_training": {
+                "use": "notAllowed"
+              }
+            }
+          }
+        }
+      ],
+      "signature_info": {
+        "alg": "Ps256",
+        "issuer": "My Organization",
+        "cert_serial_number": "553371556779539280364659500739086040091775855850",
+        "time": "2024-09-23T06:12:35+00:00"
+      },
+      "label": "urn:uuid:93582c02-3a4f-40b5-a20e-55cfe0adfdcf"
+    }
+  },
+  "validation_status": [
+    {
+      "code": "claimSignature.mismatch",
+      "url": "self#jumbf=/c2pa/urn:uuid:93582c02-3a4f-40b5-a20e-55cfe0adfdcf/c2pa.signature",
+      "explanation": "claim signature is not valid"
+    }
+  ]
+}

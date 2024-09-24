@@ -21,7 +21,7 @@ class C2PAResolver(Resolver):
 
     SCHEME = "c2pa"
 
-    def __init__(self, output_dir="./test/temp/", lstrip_paths=None):
+    def __init__(self, output_dir="./tests/temp/", lstrip_paths=None):
         if lstrip_paths is None:
             lstrip_paths = []
 
@@ -83,6 +83,7 @@ class C2PAResolver(Resolver):
             "c2patool",
             media_file,
             "-d",
+            "-f",
             "--output",
             self.output_dir
         ]
