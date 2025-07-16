@@ -11,3 +11,7 @@ attrs
 python-dateutil
 iso8601
 pathspec
+
+# C2PA and ITE-7 X.509 certificate support dependencies
+c2pa-python>=0.4.0
+cryptography>=3.4.8
